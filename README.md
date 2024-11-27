@@ -1,11 +1,16 @@
 # iCTF 2024
 
+Solutions for team `we lost`.
+
 ## Table of Contents
 
-- [web](/web)
-- [pwn](/pwn)
-- [misc](/misc)
-- [forensic](/forensic)
-- [knowledge](/knowledge)
-- [programming](/programming)
-- [machine-learning](/machine-learning)
+
+### Web
+
+- [Boing](/web/Boing/)
+- [HackChatAI](/web/HackChatAI/)
+
+
+### Knowledge
+
+- [the_stand](/knowledge/the_stand)
