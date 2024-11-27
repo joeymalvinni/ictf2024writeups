@@ -26,7 +26,7 @@ I was stuck here for most of the challenge. If I'm not able to inject code, how 
 
 In this case, my mistake was the assumption that our Selenium instance is visiting the same chat as I was. The Selenium instance actually visits the `/admin` page with an admin cookie, which is what we're trying to steal. 
 
-> ![NOTE]
+> [!NOTE]
 > The Selenium instance only starts up when you write `I need a human` in the chat
 
 If we look at the admin page:
