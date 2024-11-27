@@ -2,7 +2,7 @@
 
 Solutions and writeups for team `we lost`.
 
-![scoreboard](/media/scoreboard.png)
+![scoreboard](/media/scoreboard_cropped.png)
 
 ## Table of Contents
 
