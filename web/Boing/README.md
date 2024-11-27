@@ -44,7 +44,7 @@ src/app.py:166 seems interesting
 
 
 
-This challenge gave us a flask server which allows you to create an account, upload images, and receive a metadata file with attributes of the image. The file `app.py` contains all of the server logic, while `compute.py` generates a metadata file (`*.meta`) which is generated from whatever image you upload. 
+This challenge gave us a Flask server which allows you to create an account, upload images, and receive a metadata file with attributes of the image. The file `app.py` contains all of the server logic, while `compute.py` generates a metadata file (`*.meta`) which is generated from whatever image you upload. 
 
 ## The Attack Vector
 

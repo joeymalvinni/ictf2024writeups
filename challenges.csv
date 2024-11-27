@@ -1,0 +1,71 @@
+id,name,description,attribution,connection_info,next_id,max_attempts,value,category,type,state,requirements
+1,movie_time,"Imagine you are in 2029. You go to bed and suddenly you wake up in 1984. All naked.
+ What are the first five words that come to mind?
+
+ Flag format: All lower case, replace spaces with '_'",,,,10,50,misc,dynamic,visible,
+2,hidden_number,"I think the program is trying to tell me a ""number"". What is it?",,,,0,50,programming,dynamic,visible,
+3,gpt_calculator,"You can interact with a calculator powered by ChatGPT, which is enhanced with a python executor. You can ask it to compute math problems. Can you get the flag.txt?",,nc 0.cloud.chals.io 26042,,0,50,pwn,dynamic,visible,
+4,unencrypt_me,A student encrypted their trained PyTorch model weights but forgot the encryption key. All he remembers is that he used an 8-bit encryption key. You have access to the test dataset on which the model performed exceptionally well. Your task is to help the student decrypt the model.,,,,0,50,machine-learning,dynamic,visible,
+6,Babychecker,"This is a website that can visit links, can you GET the flag? :D",,https://ictf24-high-babychecker.chals.io,,0,50,web,dynamic,visible,
+7,ictf_welcome,"Welcome to the 2024 iCTF. 
+This is a warm-up challenge",,nc 0.cloud.chals.io 28680,,0,100,intro,standard,visible,
+8,riddle_me_this,"A poem from a guy with sunglasses:
+
+ I exist in a world within a world,
+ Where what is real is often twirled.
+
+My mind is linked to the next guy and hers,
+yet the life you live is normal but cursed.
+
+You can feel and experience what I am like
+but yet you will never grasp my full might.
+
+What am I?",,,,0,50,misc,dynamic,visible,
+9,pcaps or it didn't happen,Your computer has been acting weirdly lately and you suspect that some malicious actors are targetting your system. You therefore decided to run a network capture to see what type of traffic is hitting your machine. We did some preliminary filtering of the traffic and suspect indeed some malicious traffic hitting your system. Can you identify the malicious packets to obtain the flag?,,,,0,136,forensic,dynamic,visible,
+10,OCR Search,"Hard-coded text in video information is not uncommon in the increasingly vast digital landscape. However, for long-form videos, it can be tiresome to watch an entire video to get its content. Further, extracting information from the audio channel of some videos can be unreliable, due to accents, foreign languages, in more.
+In this challenge, you will extract the encoded text information in a long-form video file using Optical Character Recognition (OCR). OCR is a process whereby text is recognized and extracted from images/videos using computer vision, which can be outputted to a file. Once you have extracted the text information, search the file for the word ""flag"", and the flag will be directly written (and stated) in the same sentence.
+Hints: - Although you can implement your own OCR approach, or use a library, there exist many video subtitle extractor tools and GitHub repositories that provide an all-in-one solution to get you started. - You may also consider using audio recognition approaches to transcribe the audio channel (e.g., with pyTranscriber), which may be faster, but much less accurate. - In order to speed up OCR on video, you may consider dropping the framerate of the video (e.g., using ffmpeg) in order to reduce OCR operations on redundant frames. ",,,,0,50,programming,dynamic,visible,
+11,overpass,"Flip phone beeps.
+
+.. .. ..
+.. .. ..
+.. .. ..
+
+Hey (insert CTF players name)!
+
+damn, yesterday was rough… remember that me and a couple of friends went out for partying?
+Apparently, the combination of non-alcoholic beverages, good vibes and burgers made me lose control… seems like I got on a plane and went some place in the United States.
+Now that I have recovered from my party induced coma, I have absolutely no clue where I am.
+
+All I know is that I can see a something high, maybe a monument? I would say it's within around 100m of the building's roof I woke up on.
+My watch tells me that the building is 35.9 meters high. Now listen, I'm kinda lost and I need to get to this thing tomorrow. Can you help me figure out where I am?
+
+Also, can you find the nearest airport that only has two runways?
+
+Flag format: The name of the building I am on, followed by the name of the monument nearby and the IATA code of the airport. All lower case, replace spaces with '_'
+
+ictf{first_building_the_thing_airportcode}",,,,50,136,misc,dynamic,visible,
+12,MysteriousModel,"One day, you found a mysterious device with a camera attached. You figured out that this device takes pictures of grayscale (28x28 pixels) hand-written digits and classifies them using a convolutional neural network model into six different classes. Your task is to find out which six digits this mysterious model is supposed to classify (i.e., the digits that correspond to each of the model's output logits). You're given four files for this challenge - [1::mysterious_model.pth], the PyTorch model that you need to reverse engineer [2::images.npy], a collection of 100 images of digits (10 images per digit) that you can test the model with (a 100x28x28 numpy array) - [3::labels.npy], the labels (zero to nine) for the given 100 test images (a 100-dimensional numpy array) [4::architecture.py], a Python script containing the model's architecture definition (in PyTorch), a utility function (load_model) to load the model into memory for testing, and a utility function (display_image) to display individual images in the provided data. For this challenge, you need to create a Python environment with PyTorch (see https://pytorch.org/get-started/locally to get started) and Matplotlib (https://pypi.org/project/matplotlib/). You can easily solve this challenge only using a CPU (you won't need a GPU). Let's say the model's six output logits correspond to digits 3,7,1,2,5,9 (e.g., the first logit is for digit 3, the second logit is for digit 7, and so on). The flag will be 'ictf{3,7,1,2,5,9}' (no quotes).",,,,0,136,machine-learning,dynamic,visible,
+13,poppy,Let's play a game! Beat my AI and I'll give you the flag. Good luck!,,nc 0.cloud.chals.io 18002,,0,212,programming,dynamic,visible,
+14,the_calabrian_programmer,"An ancient man from Calabria, Italy once taught me how to code computer programs. Ever since then I practiced a lot, as practice makes perfect. Why don't you try me? I can show you how good I am :) at generating computer programs for you and your friends. Oh, and, there is also one more thing: he told me ""Don't ever, EVER, put your secrets in the code, or if you do it, don't store them in plain form. That should make your programs secure enough to stand the test of time ... "". ",,nc 0.cloud.chals.io 22502,,0,212,programming,dynamic,visible,
+15,aimemo,"I found this memorization service that says it can store infinite knowledge, and someone put a secret flag in there! It looks like this thing uses AI under the hood. I could not find a way to break it, can you?",,nc 0.cloud.chals.io 27842,,0,50,pwn,dynamic,visible,
+16,mayor_setter,Convince this puppy to reveal the secret. The vet said one of his favorite food is a 'format string'? What could that mean?!?,,nc 0.cloud.chals.io 11905,,0,50,pwn,dynamic,visible,
+17,distributed_training,"a server is set up to accept a 4x4 matrix upload in .pt format (e.g., you upload matA). The server will then return the results of the multiplication matA * matB, where matB is a secret matrix stored on the server. Can you get the flag?",,https://ictf24-high-distributed-training.chals.io,,0,50,pwn,dynamic,visible,
+18,where_is_my_pin?,"I bought a robot that can do all the chores for me. I am not sure how I did it but I somehow wiped my hard drive containing the pin to start it.
+
+Can you retrieve it for me?",,,,0,338,forensic,dynamic,visible,
+19,mayor_setter(again),The app talks back. Use it to find the flag.,,nc 0.cloud.chals.io 27645,,0,338,pwn,dynamic,visible,
+20,Boing,A fun app for your images!,,https://ictf24-high-boing.chals.io,,0,500,web,dynamic,visible,
+21,HackChatAI,Why rely on humans for conversation when AI can handle it for you?,,https://ictf24-high-hackchatai.chals.io,,0,388,web,dynamic,visible,
+22,bad-interpreter,"AI chatbots often make mistakes when doing math. That's why we need an interpreter to help them. It's just an python interpreter, what could go wrong?",,nc 0.cloud.chals.io 27045,,0,136,pwn,dynamic,visible,
+23,encrypted_ai,"A student has designed a PyTorch model and embedded a hidden flag within it. To add a layer of security, he encrypted the model using XOR encryption with a random 16-byte key before sharing it with his friends. However, the student forgot to save both the encryption key and the unencrypted model, making the task of revealing the hidden flag a puzzle.\n\nYour challenge is to recover the encryption key and decrypt the model to unveil the concealed information. The encrypted model file is provided i.e., `model_encrypted.pth`.\n\nGood luck, and happy decrypting!",,,,0,338,machine-learning,dynamic,visible,
+26,what_the_waf-2,"The engineers at Crypto Bros Inc. are gloriously back and they are testing out a new version of their amazing LLM WAF. This new security solution analyzes in real time every request sent to their server and drop the one containing malicious inputs.
+At Crypto Bros Inc. people are (as always) pretty confident that this will stop every possible hacking attempt.
+Rumors are saying that there is a very wealthy user on that platform, and you known... money attracts hackers ;)
+However, every hacking attempt we made so far seem to be caught by this AI powered WAF :/
+Can you help us finding a way to crack the firewall and find this wealthy user?",,https://ictf24-high-what-the-waf-2.chals.io,,0,500,web,dynamic,visible,
+27,know-it-all,"In this challenge, you will engage with an advanced AI agent capable of responding to your inquiries. However, tread carefully — your questions are bound by a constraint.",,nc 0.cloud.chals.io 32720,,0,136,pwn,dynamic,visible,
+28,hidden_in_code,"Dive into the depths of abstraction where code transforms into enigma. In this challenge, you will navigate through layers of representation, seeking hidden truths buried within the confines of a mysterious file.",,,,0,388,forensic,dynamic,visible,
+29,doppelganger_deception,Identify the classifier containing a hidden message and recover the secret.,,,,0,338,forensic,dynamic,visible,
+30,Chromapyide,"While building a new platform to quickly serach for python code snippets, we found one implementation that was a bit off and made use of ChromaDB. We were able to just get it up and running and wanted you to test it out. While trying to get it up and running one of our developers used the docker container that was supposed to shipped with the a certain flag in the home directory of user challenge. Can you read it?",,nc 0.cloud.chals.io 18271,,0,212,misc,dynamic,visible,
+31,the_stand,"Some people are good people and have friends. Randall Flagg is evil, with no friends, but he has the knowledge.",,https://ictf24-high-the-stand.chals.io,,0,500,knowledge,dynamic,visible,
