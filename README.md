@@ -1,6 +1,8 @@
 # iCTF 2024
 
-Solutions for team `we lost`.
+Solutions and writeups for team `we lost`.
+
+![scoreboard](/media/scoreboard.png)
 
 ## Table of Contents
 
