@@ -1,6 +1,6 @@
 # Boing \[500 points\] (1 solve)
 
-> 
+> A fun app for your images!
 
 ### Files:
 [src.zip](/web/Boing/src)
@@ -48,7 +48,7 @@ This challenge gave us a flask server which allows you to create an account, upl
 
 ## The Attack Vector
 
-We can see in `pages/index.html` that the image's score in the metadata needs to be over 100,000 to get the flag:
+Once you upload an image and `compute.py` generates a metadata file, we can see in `pages/index.html` that the score from this metadata needs to be over 100,000 to get the flag:
 
 ```html
     ...
@@ -77,8 +77,6 @@ Since the score is calculated by taking the natural logarithm of the product of 
 
 ### The Real Exploit
 
-The real attack vector originates in `app.py`. 
-
 After you've uploaded an image, `compute.py` is ran immediately as a subprocess:
 
 ```py
@@ -87,7 +85,7 @@ After you've uploaded an image, `compute.py` is ran immediately as a subprocess:
     subprocess.run(cmd, timeout=1)
 ```
 
-The algorithm in `compute.py` creates the metadata, calculates the image's score and adds the filename to the end of the file.
+The algorithm in `compute.py` creates the metadata, calculates the image's score and adds the filename of the given image to the end of the file
 
 <details>
 <summary>Sample metadata</summary>
@@ -107,7 +105,7 @@ Filename: c14a81fd86e74c9ee75a3e96c5935ee3.jpg
 
 <br>
 
-The interesting part of this metadata file is that the filename at the bottom of the metadata is used to symlink files from the `/tmp` directory to the `./static` directory in the project directory:
+The filename in this metadata is important, because it's used when symlinking the image and metadata from the `/tmp` directory to the `./static` directory:
 
 ```py
 @app.route('/process', methods=['GET', 'POST'])
@@ -119,6 +117,7 @@ def process_file():
             if line.startswith('Filename: '):
                 metadata_file = line.split(': ')[1].strip()
     ...
+    # symlink from the metadata filename (NOT the actual filename)
     new_file_path = os.path.join(user_static_dir, os.path.basename(metadata_file))
     os.symlink(original_file_path, new_file_path)
     new_meta_file_path = os.path.join(user_static_dir, os.path.basename(metadata_file) + '.meta')
@@ -128,23 +127,35 @@ def process_file():
 
 So, if we could craft malicious EXIF data to insert a different another filename into the metadata file, we could theoretically symlink any file into the user's static directory.
 
-The biggest problem with this is the lack of a base case; the `for` loop never ends. Thus, the last filename in the metadata is the one that's used to symlink to. This is a bit problem, but we'll touch on this later. For now, we know that we could potentially symlink something useful to our static directory.
+Our biggest problem in modifying the filename is `app.py`'s lack of a base case when reading the filename from the metadata file; the `for` loop doesn't break when it encounters a filename. Thus, the *last* filename in the metadata is the one that's used in the symlink. We'll come back to this, but because the filename is the last thing `compute.py` writes to the metadata file, whatever we write to the file will not be read and used when symlinking.
 
-And aren't we in luck. The flag is inserted into the database when the web challenge starts up:
+In case it wasn't clear already, any file we want to access needs to be in the `/static` directory. This is because the app reads only serves files from the static directory in the `/get` path:
+
+```py
+@app.route('/get/<file_name>')
+def get_file(file_name):
+    if not is_jpg_ext(file_name) and not file_name.endswith('.meta'):
+        return 'Invalid file extension', 400
+
+    user_static_dir = os.path.join(STATIC_DIR, str(session['user_id'])) # <-- concat the static dir with the user id to get the user's directory that files are stored in
+    fpath = os.path.join(user_static_dir, file_name)
+    return app.send_static_file(os.path.join(str(session['user_id']), file_name))
+```
+
+None of this would matter, though, if there isn't anything to read on the filesystem. Well, thankfully we're in luck, because the flag is inserted (in plaintext) into the sqlite3 database when the web challenge starts up:
 
 ```py
 if __name__ == '__main__':
     ...
-    if not c.fetchone():
-        c.execute('INSERT INTO users VALUES ("flagflagflagflag", "flag", ?)', ('ictf{f4ke_f1aG_bo1nG_b0ing_8oiNG}',))
+    c.execute('INSERT INTO users VALUES ("flagflagflagflag", "flag", ?)', ('ictf{f4ke_f1aG_bo1nG_b0ing_8oiNG}',))
 ```
 
-Meaning that stealing the sqlite database in `/tmp/users.db` is the most plausible way to get the flag.
+Meaning that we could steal the flag by stealing the sqlite database in `/tmp/users.db`.
 
 
 ## Execution
 
-Now we'll address the problem from earlier; how do you force one of the lines you insert into the EXIF data to be the last line in the file when the last thing that the `compute.py` file does is set the filename?
+Now we'll address our earlier problem: how can we force the EXIF data we control to be the last line in the file (for the filename tag) when the last thing that the `compute.py` file does is set the filename?
 
 <details>
 <summary>compute.py</summary>
@@ -244,9 +255,9 @@ fout.close()
 
 <br>
 
-We'll need to somehow break out of this script before it has the opportunity to reach the end.
+For our attack, we chose to crash the program before it writes the final filename by adding invalid data that `compute.py` won't decode. Essentially, we write the custom filename to the metadata file in the ImageDescription EXIF data, so that when the UserComment crashes `compute.py` our ImageDescription was the last thing added to the metadata file.
 
-Using this knowledge, this script was created:
+Here was our solution script:
 
 ```py
 from PIL import Image
@@ -267,12 +278,14 @@ exif[USER_COMMENT] = comment_payload
 
 image.save(output_file, exif=exif)
 ```
-Since we know we need our malicious filename tag to be the last one in the metadata file, we're taking advantage of invalid UTF-8 sequences to crash the program before compute.py can insert the original filename into the metadata. This code contains a payload with the byte `\x80`—a continuation byte in UTF-8 encoding. Continuation bytes (10xxxxxx) are used in multi-byte sequences and must follow a valid leading byte, which specifies the structure and length of the character. By starting with a continuation byte instead of a valid leading byte, we deliberately create an invalid UTF-8 sequence, causing Python to throw a decoding error when it attempts to process these bytes.
+
+In this script, we're taking advantage of invalid UTF-8 sequences to crash compute.py. This code contains a payload with the byte `\x80`—a continuation byte in UTF-8 encoding. Continuation bytes (10xxxxxx) are used in multi-byte sequences and must come after a valid leading byte, which specifies the structure and length of the character. By starting with a continuation byte instead of a valid leading byte, we deliberately create an invalid UTF-8 sequence, causing Python to throw a decoding error when it attempts to process these bytes.
 
 This is what happens in `compute.py` when it tries to process our malicious JPG:
 ```bash
 solution $ python3 compute.py
 ...
+Reading Image Description: '\n\nFilename: /tmp/users.db'
 Reading User Comment: b'\x80'
 Traceback (most recent call last):
   File "~/iCTF/boing/compute.py", line 52, in <module>
@@ -281,7 +294,9 @@ Traceback (most recent call last):
 UnicodeDecodeError: 'utf-8' codec can't decode byte 0x80 in position 0: invalid start byte
 ```
 
-And this is the metadata output from `compute.py`:
+As you can see, the script reads our image description and crashes when reading the user comment.
+
+To make sure that we're exploiting this correctly, here is the metadata output from `compute.py`:
 
 ```bash
 solution $ cat output_metadata.txt
@@ -290,17 +305,16 @@ Faces: 1
 Contrast: 0.9
 Area: 100000
 Score: 9.0
-ImageDescription: 
+ImageDescription:
 
 Filename: /tmp/users.db <--- last filename tag in the file is from our exif data
 ```
 
-
-To summarize, we've created a `.jpg` which will crash `compute.py` early, meaning that the  the path we control (`/tmp/users.db`) is the last filename in the metadata file. Given that `app.py` reads the last `Filename:` metadata tag, the server will now correctly symlink `/tmp/users.db` into our `static` directory. 
+To summarize our attack, we've created a `.jpg` which will crash `compute.py` early, allowing the filename that we want (`/tmp/users.db`) to be used when symlinking files into our static directory. Given that `app.py` reads the last `Filename:` metadata tag, the server will now correctly symlink `/tmp/users.db` into our `static` directory. 
 
 #### Intended solution
 
-As cool as this is, using invalid Unicode bytes wasn't the intended solution. If you look in `main.py`:
+As cool as our solution was, using invalid Unicode bytes wasn't the intended solution. If you look in `main.py`:
 
 ```py
 def compute_metadata(fpath):
@@ -309,7 +323,7 @@ def compute_metadata(fpath):
     subprocess.run(cmd, timeout=1) # 1 second timeout isn't enough to parse long regex
 ```
 
-The `compute.py` is ran with a timeout of 1 second. Yet, `compute.py` parses the UserComment EXIF data with regex which can take > 3 seconds even with really small input. Here's the problem author @p_nack's example of timing out the regex:
+The `compute.py` is ran with a timeout of 1 second. Yet, `compute.py` parses the UserComment EXIF data with regex, a regex which can take > 3 seconds to execute (even with really small input). Because of this timeout, you can insert a filename in the user comment EXIF tag before a `USER=` to make `compute.py` time out before it adds all of the metadata (e.g. the original filename). Here's the problem author @p_nack's example of timing out the regex:
 
 ```py
 from PIL import Image
@@ -327,15 +341,13 @@ image.save(img_out_fname, exif=exif)
 print(f'Image saved to {img_out_fname}')
 ```
 
-This solution means that the `compute.py` script times out before it's able to add the filename.
-
 Regardless, both of our scripts achieve the same final result of setting a custom value to symlink from in the `Filename:` metadata tag.
 
 ### Stealing the Database
 
-For us, that was the easy part. We could symlink `users.db` into our static folder, but no matter what we tried, we couldn't access the `users.db` file.
+As complicated as that sounds, stealing the database was the easy part. We could symlink `users.db` into our static folder, but no matter what we tried, we couldn't access this `users.db` file.
 
-The chief source of agony is located in this code:
+The main cause of our troubles this code:
 
 ```py
 @app.route('/get/<file_name>')
@@ -348,14 +360,14 @@ def get_file(file_name):
     return app.send_static_file(os.path.join(str(session['user_id']), file_name))
 ```
 
-This is the code that is used to serve static files, and is characterized by extension validation. This thwarts any attempts at `GET`ing the database, and even though we tried injecting lots of weird characters between the extension and the `users.db` in the request to `/get/users.db`, the URI Encoding on the characters meant that nothing would change the fact that only `.jpg` and `.meta` extensions could be requested from `/get`.
+This is the code that is used to serve static files. The extension validation for `.jpg`s and `.meta` files thwarts any attempts at `GET`ing the database (`*.db`), and even though we tried injecting lots of weird characters between the extension and the `users.db` in the request to `/get/users.db`, the URI encoding on all characters meant that only `.jpg` or `.meta` files could be served.
 
 This is where hint #2 comes in:
 
 https://www.geeksforgeeks.org/how-to-serve-static-files-in-flask/
 
 
-Since this hint is the cheapest, it's a link to a(n incredibly unhelpful) GeeksforGeeks article. I was incredibly confused, and didn't understand the purpose of this as a hint. Yet, the answer is revealed as early as the first HTML sample in the article:
+Since this hint is the cheapest, it's a link to a(n incredibly unhelpful) GeeksforGeeks article. This article almost seems useless as a resource, devoid of any real substance, so I didn't understand the purpose of this as a hint. Yet, the answer is revealed as early as the first HTML sample in the article:
 
 ```html
 <html> 
@@ -369,16 +381,17 @@ Since this hint is the cheapest, it's a link to a(n incredibly unhelpful) Geeksf
 </html> 
 ```
 
-Did you catch that? Yup, the CSS file is loaded through `/static`. Instead of going through the `/get` endpoint, we can simply query `/static/USER_ID/users.db` to steal the database and the flag.
-
-To grab my session id, I grabbed the session cookie, which looked something like this:
+Did you catch that? Yup, the CSS file is loaded through `/static`. Instead of going through the `/get` endpoint, we can simply query `/static/USER_ID/users.db` to steal the database and the flag. This means that we'll need to grab our `user_id` from the Flask session. To achieve this end, I took the session cookie, which looked something like this:
 
 ```
 session: eyJ1c2VyX2lkIjoiYzcyZDdkNzRiYjQxNWRjNTBhMDNjOGQ3ZDZkNDQ4NWMiLCJ1c2VybmFtZSI6InRlc3QifQ.Z0LCgQ.SddyjDYtQ53zamdtems3rJGSeZ0
 ```
-Running this cookie through a Flask session ID decoder allowed us to get the user_id: https://www.kirsle.net/wizards/flask-session.cgi
 
-Which resulted in something like this JSON:
+And ran this it through a Flask session ID decoder:
+
+https://www.kirsle.net/wizards/flask-session.cgi
+
+This resulted in a JSON object, something like this:
 
 ```json
 {
@@ -387,7 +400,7 @@ Which resulted in something like this JSON:
 }
 ```
 
-We can finally grab the database by downloading it from the URL `/static/c72d7d74bb415dc50a03c8d7d6d4485c/users.db`.
+Now, we can finally grab the database by downloading it from the URL `/static/c72d7d74bb415dc50a03c8d7d6d4485c/users.db`!!!!
 
 Ultimately, the flag is in plaintext in the database.
 
@@ -395,12 +408,14 @@ Ultimately, the flag is in plaintext in the database.
 ictf{b01ng_b01ng_U_g0t_me}
 ```
 
+![final flag submission](/web/Boing/solution/boing_flag_submission.png)
+
 ## Conclusion
 
 
 This challenge was wild. Not only was it the hardest challenge to be complete by a High School team, but it was only solved by 4/27 undergraduate teams. 
 
-Also, over the course of this challenge, I exclusively registered and used two accounts: test:test and admin:admin. The JPG containing the EXIF payload was uploaded under the test account. On the final day, two different teams logged into the system and discovered the JPGs I had uploaded (I only know this because they each contacted me about this). If either team had examined the EXIF data in any of the JPGs, they would have uncovered at least half of the solution. Fortunately, neither of them noticed.
+Also, over the course of this challenge, I exclusively registered and used two accounts: test:test and admin:admin. The JPG containing the EXIF payload was uploaded under the test account. On the final day, two different teams logged into the system and discovered the JPGs I had uploaded (I know this because they each contacted me about this). If either team had examined the EXIF data in any of the JPGs, they would have uncovered at least half of the solution. Fortunately, neither of them noticed.
 
 ![Final solution](/web/Boing/solution/solution.jpg)
 <br>
