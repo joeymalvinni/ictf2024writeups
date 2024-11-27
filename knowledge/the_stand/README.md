@@ -4,7 +4,8 @@
 
 This challenge consists of solely a web interface, which we can deduce is powered by Express and nginx (presumably for load balancing) from response headers. Also, as you might be able to tell from the title, the entire challenge uses names and quotes from Steven King's 1978 dark fantasy novel "The Stand."
 
-This problem was mainly solved by Aayush, but was also worked on by Nate, Alex, Ryan, Lauren, and Eamon.
+> [!NOTE]
+> This problem was mainly solved by Aayush, but was also worked on a lot by Nate, Alex, Ryan, Lauren, and Eamon.
 
 ## The Attack Vector
 
@@ -104,7 +105,7 @@ Randall' }) OPTIONAL MATCH (n) RETURN n.tag as personTag, n.firstName as firstNa
 
 When it's all formatted correctly and concatenated on the server, the query looks something like this:
 
-> ![NOTE]
+> [!NOTE]
 > I've added a couple of newlines between the injected query and the comment just for viewing purposes.
 
 ```
