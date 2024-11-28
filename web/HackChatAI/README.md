@@ -11,7 +11,7 @@ This challenge gives us a Flask chat app which allows us to communicate with a G
 
 The goal is pretty obvious: steal the admin's cookie, log in to `/admin` and get the flag from the admin chat.
 
-Since this is a Flask app, the biggest thing that I was looking for was if the challenge disabled autoescaping. Autoescaping is done by default by Flask, and it ensures that anything dynamically loaded via templates into our HTML is treated like plain text, not as HTML. If the challenge turns autoescaping off, we will be able to perform basic XSS attacks to exfiltrate data from the admin. Yet, if we look at our `index.html` file, we can see that there aren't any `| safe` operators (these would turn off autoescaping and allow for our messages to be parsed as HTML):
+Since this is a Flask app, I was mostly looking for `| safe` operators, since they turn of Flask's autoescaping. Autoescaping is done by default by Flask, and it ensures that anything dynamically loaded via templates into our HTML is treated like plain text, not as HTML. If the challenge turns autoescaping off, we will be able to perform basic XSS attacks to exfiltrate data from the admin. Yet, if we look at our `index.html` file, we can see that there aren't any `| safe` operators (these would turn off autoescaping and allow for our messages to be parsed as HTML):
 
 ```html
     <h2>Chat Page</h2>
