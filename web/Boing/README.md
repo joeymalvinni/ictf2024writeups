@@ -8,7 +8,7 @@
 ### Hints
 
 > [!NOTE]  
-> These hints would originally subtract points from your team if you used them, but team `4mail` violated fair play and used a secondary account to get hints without incurring point deductions on their main team account. This ultimately resulted in their disqualification from prize results in the tournament, but this also meant that every other team had full access to the hints. However, we had already been working on this challenge for a day and were already beyond the hints.
+> These hints would originally subtract points from your team if you used them, but team `4mail` violated fair play and used a secondary account to get hints without incurring point deductions on their main team account. This ultimately resulted in their disqualification from prize results in the tournament, but this also meant that every other team had full access to the hints. However, we had already been working on this challenge for a day and had no need for these hints.
 
 These were the available hints:
 
