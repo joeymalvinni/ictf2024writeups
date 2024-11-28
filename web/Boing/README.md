@@ -255,7 +255,7 @@ fout.close()
 
 <br>
 
-For our attack, we chose to crash the program before it writes the final filename by adding invalid data that `compute.py` won't decode. Essentially, we write the custom filename to the metadata file in the ImageDescription EXIF data, so that when the UserComment crashes `compute.py` our ImageDescription was the last thing added to the metadata file.
+For our attack, we chose to crash the program before it writes the final filename by adding invalid data that `compute.py` won't decode. Essentially, we write the custom filename to the metadata file in the ImageDescription EXIF data, so that when the UserComment crashes `compute.py` our ImageDescription is the last thing added to the metadata file.
 
 Here was our solution script:
 
