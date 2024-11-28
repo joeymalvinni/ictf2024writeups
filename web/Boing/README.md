@@ -129,7 +129,7 @@ So, if we could craft malicious EXIF data to insert a different another filename
 
 Our biggest problem in modifying the filename is `app.py`'s lack of a base case when reading the filename from the metadata file; the `for` loop doesn't break when it encounters a filename. Thus, the *last* filename in the metadata is the one that's used in the symlink. We'll come back to this, but because the filename is the last thing `compute.py` writes to the metadata file, whatever we write to the file will not be read and used when symlinking.
 
-In case it wasn't clear already, any file we want to access needs to be in the `/static` directory. This is because the app reads only serves files from the static directory in the `/get` path:
+In case it wasn't clear already, any file we want to access needs to be in the `/static` directory. This is because the app only serves files from the static directory in the `/get` path:
 
 ```py
 @app.route('/get/<file_name>')
