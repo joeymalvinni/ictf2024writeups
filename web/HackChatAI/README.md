@@ -44,7 +44,7 @@ If we look at the admin page:
 
 We can see that all of our messages have autoescaping turned off, allowing for us to use XSS to steal the admin account.
 
-When tinkering with different XSS attacks, the biggest deterrent I found was this error I:
+When tinkering with different XSS attacks, the biggest deterrent I found was this error:
 
 ![console fetch error](/web/HackChatAI/solution/cors_error.png)
 
